@@ -3,7 +3,7 @@ import { Physics } from 'phaser';
 export default class Player extends Physics.Arcade.Sprite {
     constructor(scene, x, y) {
         super(scene, x, y, 'player-walk');
-        scene.add.existing(this);
+        scene.add.existing(this).setScale(1);
         scene.physics.add.existing(this);
 
         this.accel = 3000;
@@ -20,6 +20,7 @@ export default class Player extends Physics.Arcade.Sprite {
             .setScale(this.scaleX)
             .setOrigin(0.3, 0.5);
         this.gun.offset = offset;
+        this.gun.damage = 20;
 
         if (!scene.anims.exists('walk')) {
             scene.anims.create({

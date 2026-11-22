@@ -18,9 +18,10 @@ const config = {
     physics: {
         default: 'arcade',
         arcade: {
-            fps: 100,
+            fps: 200,
+            fixedStep: false,
             gravity: { y: 0 }, // top-down game can set 0
-            debug: false // should be False
+            debug: true // should be False
         }
     },
     render: {

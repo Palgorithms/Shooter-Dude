@@ -213,6 +213,8 @@
 import { Scene, Input } from 'phaser';
 import Player from '../classes/Player';
 import Bullet from '../classes/Bullet';
+import Enemy from '../classes/Enemy';
+// import Enemy from '../classes/Enemy';
 
 export class Game extends Scene {
     constructor() {
@@ -240,7 +242,7 @@ export class Game extends Scene {
         this.input.mouse.disableContextMenu();
         this.mouse = this.input.activePointer;
 
-        console.log(this.scale)
+        // console.log(this.scale)
         this.bg = this.add.tileSprite(
             0, 0,
             this.scale.width, this.scale.height,
@@ -256,6 +258,36 @@ export class Game extends Scene {
             this.game.config.height / 2
         );
 
+        //  Bullets
+        this.bullets = this.physics.add.group({
+            classType: Bullet,
+            maxSize : 20
+        });
+
+        //  Enemys
+        this.enemys = this.physics.add.group({
+            classType: Enemy,
+            maxSize : 30,
+            runChildUpdate: true // This automatically calls enemy.update() every frame!
+        });
+        // this.enemys.push(
+        //     new Enemy(
+        //         this,
+        //         this.game.config.width,
+        //         this.game.config.height/2,
+        //         50,
+        //         0xff0000
+        //     )
+        // )
+
+        //  Enemys Spawner
+        this.enemySpawner = this.time.addEvent({
+            delay : 2000,
+            callback : this.spawnEnemy,
+            callbackScope : this,
+            loop : true
+        })
+
         // Camera follow
         this.cam.startFollow(this.player, true, 0.2, 0.2);
 
@@ -266,23 +298,86 @@ export class Game extends Scene {
     update() {        
         this.mouse.updateWorldPoint(this.cam);
         this.player.update(this.mouse.worldX, this.mouse.worldY);
+        // this.enemys.forEach((enemy) => {
+        //     enemy.update(this.player.x,this.player.y)
+        // })
 
         this.bg.tilePositionX = this.cam.scrollX;
         this.bg.tilePositionY = this.cam.scrollY;
+
+        this.handleOverlaps()
     }
 
     shoot() {
         const g = this.player.gun;
         const angle = g.rotation;
         const tip = 10 * g.scaleX;
-        new Bullet(
-            this,
+        // this.bullets.push(
+        //     new Bullet(
+        //         this,
+        //         g.x + Math.cos(angle) * tip,
+        //         g.y + Math.sin(angle) * tip,
+        //         'bullet',
+        //         angle,
+        //         this.player.maxSpeed * 3,
+        //         // this.player.maxSpeed * 1,
+        //         g.damage,
+        //         this.player.scaleX*1.5,
+        //         // this.player.scaleX*5,
+        //     )
+        // )
+        let b = this.bullets.get(
             g.x + Math.cos(angle) * tip,
             g.y + Math.sin(angle) * tip,
             'bullet',
-            angle,
-            this.player.maxSpeed * 4,
-            this.player.scaleX
         );
+        if(b)
+            b.fire(
+                angle,
+                this.player.maxSpeed * 3,
+                // this.player.maxSpeed * 1,
+                g.damage,
+                this.player.scaleX*1.5,
+                // this.player.scaleX*5,
+            )
+
+        // console.log(this.bullets)
+    }
+
+    spawnEnemy(rad=50,color=0xff0000){
+        if(this.enemys.length<30){
+            let ang = Math.random()*Math.PI*2; 
+            let dis = Math.hypot(this.game.config.width/2+rad/2,this.game.config.height/2+rad/2);
+            this.enemys.push(
+                new Enemy(
+                    this,
+                    dis * Math.cos(ang) + this.player.x,
+                    dis * Math.sin(ang) + this.player.y,
+                    rad,
+                    color
+                )
+            )
+        }
+    }
+
+    handleOverlaps(){
+        this.physics.overlap(this.enemys,this.bullets,(e,b)=>{
+            e.radius -= 10;
+            e.body.setCircle(e.radius)
+            e.speed += 60;
+
+            if(e.radius <= 0){
+                this.enemys.splice(this.enemys.findIndex( ee => ee == e),1)
+                e.destroy()
+            }
+            
+            if(this.bullets.length){
+                this.bullets.splice(this.bullets.findIndex( bb => bb == b),1)
+                b.destroy()
+            }
+            
+            console.log(this.enemys)
+            // console.log(b)
+        })
     }
 }

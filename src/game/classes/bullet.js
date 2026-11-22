@@ -45,34 +45,68 @@
 import { Physics } from 'phaser';
 
 export default class Bullet extends Physics.Arcade.Sprite {
-    constructor(scene, x, y, texture, angleRad, speed, scale = 1) {
+    constructor(scene, x, y, texture) {
         super(scene, x, y, texture);
 
         scene.add.existing(this);
         scene.physics.add.existing(this);
+        this.scene = scene;
 
         this.damage = 10;
+
+        // this.damage = damage;
+        // this.lifespan = 2000;
+
+        // this.setScale(scale);
+        // let bodyScale = 1;
+        // let r = Math.hypot(this.width*(bodyScale/2),this.height*(bodyScale/2));
+        // this.body.setCircle(r,-(r-this.width/2),-(r-this.height/2));
+        
+        // this.lifeTimer = scene.time.delayedCall(this.lifespan, () => this.disableBody(true,true));
+        
+        // this.body.setOrigin()
+        // this.refreshBody();
+        // this.body.setSize(this.width*2,this.height*2);
+
+        // this.fire(x, y, angleRad, speed);
+    }
+
+    fire(angleRad, speed, damage, scale = 1) {
+        this.body.enable = true;
+        this.setActive(true)
+        this.setVisible(true)
+
+        this.damage = damage;
         this.lifespan = 2000;
 
         this.setScale(scale);
-        this.refreshBody();
+        let bodyScale = 1;
+        let r = Math.hypot(this.width*(bodyScale/2),this.height*(bodyScale/2));
+        this.body.setCircle(r,-(r-this.width/2),-(r-this.height/2));
+        
+        if (this.lifeTimer) {
+            this.lifeTimer.remove();
+        }
+        this.lifeTimer = this.scene.time.delayedCall(this.lifespan, () => this.disableBody(true,true));
 
-        this.lifeTimer = scene.time.delayedCall(this.lifespan, () => this.destroy());
-
-        this.fire(x, y, angleRad, speed);
-    }
-
-    fire(x, y, angleRad, speed) {
-        this.setPosition(x, y);
-        this.setRotation(angleRad);              // ← radians
+        this.setRotation(angleRad);
         this.scene.physics.velocityFromRotation(angleRad, speed, this.body.velocity);
     }
 
-    destroy(fromScene) {
-        if (this.lifeTimer) {
-            this.lifeTimer.remove();
-            this.lifeTimer = null;
-        }
-        super.destroy(fromScene);
+    // destroy(fromScene) {
+    //     if (this.lifeTimer) {
+    //         this.lifeTimer.remove();
+    //         this.lifeTimer = null;
+    //     }
+
+    //     if(this.scene.bullets.length){
+    //         this.scene.bullets.splice(this.scene.bullets.findIndex( b => b == this),1)
+    //     }
+
+    //     super.destroy(fromScene);
+    // }
+
+    overlap(entity){
+        entity.damage(this.damage)
     }
 }
