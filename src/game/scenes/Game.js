@@ -261,7 +261,7 @@ export class Game extends Scene {
         //  Bullets
         this.bullets = this.physics.add.group({
             classType: Bullet,
-            maxSize : 20
+            maxSize : 18
         });
 
         //  Enemys
@@ -345,36 +345,47 @@ export class Game extends Scene {
     }
 
     spawnEnemy(rad=50,color=0xff0000){
-        if(this.enemys.length<30){
-            let ang = Math.random()*Math.PI*2; 
-            let dis = Math.hypot(this.game.config.width/2+rad/2,this.game.config.height/2+rad/2);
-            this.enemys.push(
-                new Enemy(
-                    this,
-                    dis * Math.cos(ang) + this.player.x,
-                    dis * Math.sin(ang) + this.player.y,
-                    rad,
-                    color
-                )
-            )
+        // if(this.enemys.length<30){
+        //     let ang = Math.random()*Math.PI*2; 
+        //     let dis = Math.hypot(this.game.config.width/2+rad/2,this.game.config.height/2+rad/2);
+        //     this.enemys.push(
+        //         new Enemy(
+        //             this,
+        //             dis * Math.cos(ang) + this.player.x,
+        //             dis * Math.sin(ang) + this.player.y,
+        //             rad,
+        //             color
+        //         )
+        //     )
+        // }
+
+        let speed = this.player.maxSpeed/5;
+        let ang = Math.random()*Math.PI*2; 
+        let dis = Math.hypot(this.game.config.width/2+rad/2,this.game.config.height/2+rad/2);
+        let e = this.enemys.get(
+            dis * Math.cos(ang) + this.player.x,
+            dis * Math.sin(ang) + this.player.y,
+        );
+        if(e){
+            e.spawn(speed, rad, color)
         }
     }
 
     handleOverlaps(){
         this.physics.overlap(this.enemys,this.bullets,(e,b)=>{
-            e.radius -= 10;
-            e.body.setCircle(e.radius)
-            e.speed += 60;
+            e.damage();
 
-            if(e.radius <= 0){
-                this.enemys.splice(this.enemys.findIndex( ee => ee == e),1)
-                e.destroy()
-            }
+            b.disableBody(true,true)
+
+            // if(e.radius <= 0){
+            //     this.enemys.splice(this.enemys.findIndex( ee => ee == e),1)
+            //     e.destroy()
+            // }
             
-            if(this.bullets.length){
-                this.bullets.splice(this.bullets.findIndex( bb => bb == b),1)
-                b.destroy()
-            }
+            // if(this.bullets.length){
+            //     this.bullets.splice(this.bullets.findIndex( bb => bb == b),1)
+            //     b.destroy()
+            // }
             
             console.log(this.enemys)
             // console.log(b)

@@ -71,7 +71,7 @@ export default class Bullet extends Physics.Arcade.Sprite {
         // this.fire(x, y, angleRad, speed);
     }
 
-    fire(angleRad, speed, damage, scale = 1) {
+    fire(angleRad, speed, damage = 10, scale = 1) {
         this.body.enable = true;
         this.setActive(true)
         this.setVisible(true)
