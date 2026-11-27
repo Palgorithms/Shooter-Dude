@@ -211,10 +211,10 @@
 
 
 import { Scene, Input } from 'phaser';
+
 import Player from '../classes/Player';
 import Bullet from '../classes/Bullet';
 import Enemy from '../classes/Enemy';
-// import Enemy from '../classes/Enemy';
 
 export class Game extends Scene {
     constructor() {
@@ -225,7 +225,7 @@ export class Game extends Scene {
         // this.load.image('player', 'assets/player/soldierCut.png');
         this.load.image('grid', 'assets/tileLines.png');
         this.load.image('gun', 'assets/player/gun.png');
-        this.load.image('bullet', 'assets/player/red-bullet.png');
+        this.load.image('bullet', 'assets/player/bullet.png');
         this.load.spritesheet('player-walk', 'assets/player/walk.png', {
             frameWidth: 28,
             frameHeight: 45
@@ -233,6 +233,12 @@ export class Game extends Scene {
     }
 
     create() {
+        // HUD Scene
+        this.scene.launch('HudScene');
+        const container = document.getElementById('game-container');
+        // const isStretched = container.classList.toggle('stretch-mode');
+        this.scale.refresh();
+
         // Camera
         this.cam = this.cameras.main;
         this.cam.setZoom(1.2);
@@ -282,7 +288,7 @@ export class Game extends Scene {
 
         //  Enemys Spawner
         this.enemySpawner = this.time.addEvent({
-            delay : 2000,
+            delay : 2000,  //  2000
             callback : this.spawnEnemy,
             callbackScope : this,
             loop : true
@@ -309,9 +315,6 @@ export class Game extends Scene {
     }
 
     shoot() {
-        const g = this.player.gun;
-        const angle = g.rotation;
-        const tip = 10 * g.scaleX;
         // this.bullets.push(
         //     new Bullet(
         //         this,
@@ -326,6 +329,9 @@ export class Game extends Scene {
         //         // this.player.scaleX*5,
         //     )
         // )
+        const g = this.player.gun;
+        const angle = g.rotation;
+        const tip = 10 * g.scaleX;
         let b = this.bullets.get(
             g.x + Math.cos(angle) * tip,
             g.y + Math.sin(angle) * tip,
@@ -334,11 +340,11 @@ export class Game extends Scene {
         if(b)
             b.fire(
                 angle,
-                this.player.maxSpeed * 3,
-                // this.player.maxSpeed * 1,
+                this.player.maxSpeed * 1.7,
+                // this.player.maxSpeed * 1.7,
                 g.damage,
-                this.player.scaleX*1.5,
-                // this.player.scaleX*5,
+                this.player.scaleX * 1,
+                // this.player.scaleX * .8,
             )
 
         // console.log(this.bullets)
@@ -373,22 +379,8 @@ export class Game extends Scene {
 
     handleOverlaps(){
         this.physics.overlap(this.enemys,this.bullets,(e,b)=>{
-            e.damage();
-
+            e.damage(b.damage);
             b.disableBody(true,true)
-
-            // if(e.radius <= 0){
-            //     this.enemys.splice(this.enemys.findIndex( ee => ee == e),1)
-            //     e.destroy()
-            // }
-            
-            // if(this.bullets.length){
-            //     this.bullets.splice(this.bullets.findIndex( bb => bb == b),1)
-            //     b.destroy()
-            // }
-            
-            console.log(this.enemys)
-            // console.log(b)
         })
     }
 }

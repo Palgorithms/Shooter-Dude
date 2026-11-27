@@ -80,9 +80,10 @@ export default class Bullet extends Physics.Arcade.Sprite {
         this.lifespan = 2000;
 
         this.setScale(scale);
-        let bodyScale = 1;
+        let bodyScale = .65;
+        let bodyOffset = { x : Math.cos(angleRad) * -1 , y : Math.sin(angleRad) * 0}
         let r = Math.hypot(this.width*(bodyScale/2),this.height*(bodyScale/2));
-        this.body.setCircle(r,-(r-this.width/2),-(r-this.height/2));
+        this.body.setCircle(r,-(r-this.width/2)+bodyOffset.x,-(r-this.height/2)+bodyOffset.y);
         
         if (this.lifeTimer) {
             this.lifeTimer.remove();

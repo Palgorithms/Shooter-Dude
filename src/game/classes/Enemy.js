@@ -13,6 +13,8 @@ export default class Enemy extends GameObjects.Arc {
 
         // this.speed = 50;
         this.speed = scene.player.maxSpeed/5;
+        this.maxHealth = 50;
+        this.health = 50;
 
         
     }
@@ -25,6 +27,7 @@ export default class Enemy extends GameObjects.Arc {
 
         //  Reset Speed
         this.speed = speed;
+        this.health = this.maxHealth;
 
         //  Reset Size
         this.setRadius(radius);
@@ -33,13 +36,14 @@ export default class Enemy extends GameObjects.Arc {
         this.body.setCircle(radius);
     }
 
-    damage(){
+    damage(damage){
         // this.radius -= 10;
-        this.setRadius(this.radius-10);
+        this.health -= damage;
+        this.setRadius(this.health);
         this.body.setCircle(this.radius)
         this.speed += 60;
 
-        if(this.radius <= 0){
+        if(this.health <= 0){
             // this.disableBody(true,true)
             this.body.enable = false; // Turn off physics
             this.setActive(false);    // Mark as dead for .get() to recycle

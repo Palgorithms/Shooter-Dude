@@ -1,6 +1,8 @@
-import { Game as MainGame } from './scenes/Game';
-import { MainMenu } from './scenes/MainMenu';
 import { AUTO, Game, Scale } from 'phaser';
+
+import { Game as MainGame } from './scenes/Game';
+import MainMenu from './scenes/MainMenu';
+import HudScene from './scenes/HudScene';
 
 //  Find out more information about the Game Config at:
 //  https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
@@ -21,19 +23,26 @@ const config = {
             fps: 200,
             fixedStep: false,
             gravity: { y: 0 }, // top-down game can set 0
-            debug: true // should be False
+            // debug: true // should be False
         }
     },
     render: {
         roundPixels: true
     },
     scale: {
-        mode: Scale.ENVELOP,    //  Fit
-        autoCenter: Scale.CENTER_BOTH
+        mode: Scale.FIT,    //  Fit
+        autoCenter: Scale.CENTER_BOTH,
+        // parent: 'game-container',
+        // width: 1024,  // Your base resolution
+        // height: 768
+    },
+    input: {
+        windowEvents: true // This tells Phaser to listen to mouse events on the whole window
     },
     scene: [
         MainMenu,
         MainGame,
+        HudScene
     ]
 };
 

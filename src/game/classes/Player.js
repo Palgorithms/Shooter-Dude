@@ -20,7 +20,7 @@ export default class Player extends Physics.Arcade.Sprite {
             .setScale(this.scaleX)
             .setOrigin(0.3, 0.5);
         this.gun.offset = offset;
-        this.gun.damage = 20;
+        this.gun.damage = 10;
 
         if (!scene.anims.exists('walk')) {
             scene.anims.create({
